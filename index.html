@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Le drag and drop avec HTML5 et jQuery</title>
+<script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script type="text/javascript">
+$(document).ready(function() {    
+    // ajouter propriété pour drop et transfert de données
+    //$.event.props.push('dataTransfer');// Attention : ne fonctionne plus si jQuery > 3 : passer par originalEvent (cf ci-dessous)
+
+    // dessin des billes
+    for(var i=1; i<=5; i++){
+        var monCanvas = $('#bille'+i)[0];
+        var context = monCanvas.getContext('2d');
+        context.clearRect(0,0, monCanvas.width,monCanvas.height);
+        dessineBalle(context,i);
+    }
+
+    // gestionnaires des billes
+    for(var i=1; i<=5; i++){
+        // attention : var canvas = $('#myCanvas') renvoie un objet jQuery par un élément du DOM
+        $('#bille'+i).on({
+             dragstart: function(e) {
+                var id = $(this).attr('id');
+                $('#info').html("déplacement de "+id);
+                $(this).css('opacity', '0.5');
+                // on garde l'identifiant en mémoire
+                //e.dataTransfer.setData('text/html', id);
+                e.originalEvent.dataTransfer.setData('text/html', id);
+            },
+            dragend: function() {
+                var id = $(this).attr('id');
+                $('#info').html("fin du déplacement de "+id);
+                $(this).css('opacity', '1');
+            }
+        });
+    }
+    // gestionnaires des boîtes
+    for(var i=1; i<=2; i++){
+        $('#boite'+i).on({
+            dragover: function(e) {
+                e.preventDefault();
+            },
+            drop: function(e) {
+                //var data = e.dataTransfer.getData('text/html');
+                var data = e.originalEvent.dataTransfer.getData('text/html');
+                $(this).append($("#"+data));
+            }
+        });    
+    }
+    
+    // dessin d'une balle : x départ, vitesse / y, rayon
+    function dessineBalle(ctx,numero){
+        // dessin
+        ctx.translate(20,20);
+          ctx.beginPath();
+          ctx.arc(0, 0, 18, 0, 2 * Math.PI, false);
+          ctx.fillStyle = 'green';
+          ctx.fill();
+          ctx.lineWidth = 1;
+          ctx.strokeStyle = '#003300';
+          ctx.stroke();        
+        ctx.fillStyle    = '#fff';
+        ctx.font         = 'Italic 18px Sans-Serif';
+        ctx.fillText  (i, -7, 4);
+    }        
+    
+});
+</script>
+<style>
+    body {
+        background-color:#BFE1D8;
+    }
+    #boite1, #boite2 {
+        background-color:white;
+        vertical-align:top;
+    }
+</style>
+
+</head>
+<body>
+    <h2>Les billes dans les boîtes</h2>
+
+    <!-- information -->
+    <p id="info"></p>
+    
+    <!-- les boîtes -->
+    <div id="boite1"></div>
+    <div id="boite2"></div>
+    
+    <!-- les billes -->
+    <canvas id="bille1" width="40" height="40" draggable="true" >
+        Texte pour les navigateurs qui ne supportent pas canvas
+    </canvas>
+    <canvas id="bille2" width="40" height="40" draggable="true" >
+        Texte pour les navigateurs qui ne supportent pas canvas
+    </canvas>
+    <canvas id="bille3" width="40" height="40" draggable="true" >
+        Texte pour les navigateurs qui ne supportent pas canvas
+    </canvas>
+    <canvas id="bille4" width="40" height="40" draggable="true" >
+        Texte pour les navigateurs qui ne supportent pas canvas
+    </canvas>
+    <canvas id="bille5" width="40" height="40" draggable="true" >
+        Texte pour les navigateurs qui ne supportent pas canvas
+    </canvas>    
+    <style type="text/css">
+        #boite1, #boite2 {
+            display:inline-block;
+            width:200px;height:200px;border:1px solid #aaaaaa;
+        }
+    </style>
+    
+</body>
+</html>
